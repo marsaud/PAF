@@ -16,7 +16,7 @@ abstract class PAF_Object_Base
      * Every sub-type of PAF_Object_Base will cache it's property access way
      * (use of get/set methods or direct attribute) in this static object.
      *
-     * @var stdClass[]
+     * @var stdClass
      */
     private static $_cache = NULL;
 
@@ -38,7 +38,17 @@ abstract class PAF_Object_Base
      * @var type
      */
     private $_initialized;
+    /**
+     * The readable properties
+     *
+     * @var string[]
+     */
     protected $_readProperties = array();
+    /**
+     * The writable properties
+     *
+     * @var string[]
+     */
     protected $_writeProperties = array();
 
     /**
@@ -107,10 +117,14 @@ abstract class PAF_Object_Base
     }
 
     /**
-     * The method SHOULD be implemented to call the
+     * This method SHOULD be implemented to call the
      * _extend(Read|Write)?Properties methods when extending.
      *
+     * When extending, this method MUST call it's parent method if it exists.
+     *
      * @return void
+     *
+     * @codeCoverageIgnore
      */
     abstract protected function _initProperties();
 
@@ -126,13 +140,13 @@ abstract class PAF_Object_Base
     {
         if (!$this->_initialized)
         {
-            $this->initProperties();
+            $this->_initProperties();
             $this->_initialized = true;
         }
     }
 
     /**
-     * This MAY be called by all sub-type constructors.
+     * This MUST be called by all sub-type constructors.
      */
     public function __construct()
     {
@@ -160,17 +174,17 @@ abstract class PAF_Object_Base
 
         self::_initCache();
         $class = get_class($this);
-        if ($att = $this->_accessorLookUp(
+        if ($accessor = $this->_accessorLookUp(
             $class, $this->_readProperties[$name]
         ))
         {
-            return $this->{$access}();
+            return $this->{$accessor}();
         }
-        elseif ($access = $this->_attributeLookUp(
+        elseif ($attribute = $this->_attributeLookUp(
             $class, $this->_readProperties[$name]
         ))
         {
-            return $this->{$att};
+            return $this->{$attribute};
         }
         else
         {
@@ -200,17 +214,17 @@ abstract class PAF_Object_Base
 
         self::_initCache();
         $class = get_class($this);
-        if ($att = $this->_accessorLookUp(
+        if ($accessor = $this->_accessorLookUp(
             $class, $this->_writeProperties[$name], true
         ))
         {
-            $this->{$access}($value);
+            $this->{$accessor}($value);
         }
-        elseif ($access = $this->_attributeLookUp(
+        elseif ($attribute = $this->_attributeLookUp(
             $class, $this->_writeProperties[$name], true
         ))
         {
-            $this->{$att} = $value;
+            $this->{$attribute} = $value;
         }
         else
         {
@@ -262,8 +276,7 @@ abstract class PAF_Object_Base
         {
             $methods = get_class_methods($class);
             self::$_cache->{$id} =
-                array_key_exists($method, $methods) ?
-                $method : false;
+                in_array($method, $methods) ? $method : false;
         }
 
         return self::$_cache->{$id};

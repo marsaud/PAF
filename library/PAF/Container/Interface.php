@@ -12,7 +12,7 @@
  *
  * @author fabrice
  */
-class PAF_Container_Interface
+interface PAF_Container_Interface
 {
     /**
      * Gives back a determined resoucre identified by it's name.
@@ -24,7 +24,7 @@ class PAF_Container_Interface
      *
      * @throws PAF_Exception_NoSuchIdentifier if the resource name is not known
      * in the scope of this container.
-     * 
+     *
      */
     public function get($resourceName);
 }
