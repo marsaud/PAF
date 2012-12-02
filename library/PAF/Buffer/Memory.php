@@ -12,7 +12,7 @@
  * 
  * @property-read string $id The buffer id
  */
-class PAF_Buffer_Memory implements PAF_Buffer_Interface, PAF_Bufferable_Interface
+class PAF_Buffer_Memory implements PAF_Buffer_Interface, PAF_Buffer_AbleInterface
 {
 
     /**
@@ -124,23 +124,31 @@ class PAF_Buffer_Memory implements PAF_Buffer_Interface, PAF_Bufferable_Interfac
             throw new PAF_Exception_IllegalArgument('Unknown piece type "' . $piece . '" fro pulling.');
         }
     }
-    
+
     protected function _pullBytes($length = NULL)
     {
+        NULL !== $length
+                || $length = strlen($this->_content);
+
         $pulled = substr($this->_content, 0, $length);
         $kept = substr($this->_content, $length);
         $this->_content = $kept;
         return $pulled;
     }
-    
-    /**
-     * @todo
-     * 
-     * @param type $length
-     */
+
     protected function _pullLines($length = NULL)
     {
+        $lines = explode(PHP_EOL, $this->_content);
         
+        NULL !== $length
+                || $length = count($lines);
+        
+        $pulled = array_slice($lines, 0, $length);
+        $kept = array_slice($lines, $length);
+        
+        $this->_content = implode(PHP_EOL, $kept);
+        
+        return implode(PHP_EOL, $pulled);
     }
 
     public function get()
