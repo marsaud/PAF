@@ -13,6 +13,7 @@
  */
 interface PAF_View_Interface
 {
+
     /**
      * The content of the view is resolved and pushed to it's output stream.
      *
