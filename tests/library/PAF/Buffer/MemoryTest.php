@@ -34,11 +34,32 @@ class PAF_Buffer_MemoryTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers PAF_Buffer_Memory::push
-     * @todo Implement testPush().
+     * @dataProvider pushProvider
      */
-    public function testPush()
+    public function testPush($first, $second, $all)
     {
-        
+        $this->object->push($first);
+        $this->assertEquals($first, $this->object->get());
+        $this->object->push($second);
+        $this->assertEquals($all, $this->object->get());
+    }
+
+    public function pushProvider()
+    {
+        $data = array();
+
+        $data[] = array('a', 'b', 'ab');
+        $data[] = array('a ', 'b ', 'a b ');
+        $data[] = array(' a', ' b', ' a b');
+        $data[] = array('a' . PHP_EOL, 'b' . PHP_EOL, 'a' . PHP_EOL . 'b' . PHP_EOL);
+        $data[] = array(0, 1, '01');
+        $data[] = array(NULL, 'a', 'a');
+        $data[] = array('', 'a', 'a');
+        $data[] = array('a', NULL, 'a');
+        $data[] = array(NULL, NULL, '');
+        $data[] = array('', '', '');
+
+        return $data;
     }
 
     /**
@@ -79,26 +100,44 @@ class PAF_Buffer_MemoryTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers PAF_Buffer_Memory::pull
-     * @todo Implement testPull().
+     * @dataProvider pullProvider
      */
-    public function testPull()
+    public function testPull($content)
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $this->object->push($content);
+        $this->assertEquals($content, $this->object->get());
+        $this->assertEquals($content, $this->object->pull());
+        $this->assertEquals('', $this->object->get());
+    }
+
+    public function pullProvider()
+    {
+        $data = array();
+
+        $data[] = array('a');
+        $data[] = array('a ');
+        $data[] = array(' a');
+        $data[] = array('a' . PHP_EOL);
+        $data[] = array(PHP_EOL . 'a');
+        $data[] = array('a' . PHP_EOL . 'b');
+
+        return $data;
     }
 
     /**
      * @covers PAF_Buffer_Memory::get
-     * @todo Implement testGet().
+     * @dataProvider getProvider
      */
-    public function testGet()
+    public function testGet($content)
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $this->assertEquals('', $this->object->get());
+        $this->object->push($content);
+        $this->assertEquals($content, $this->object->get());
+    }
+
+    public function getProvider()
+    {
+        return $this->pullProvider();
     }
 
     /**
@@ -127,28 +166,43 @@ class PAF_Buffer_MemoryTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers PAF_Buffer_Memory::__get
-     * @todo Implement test__get().
      */
     public function test__get()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $this->setExpectedException('PAF_Exception_NoSuchProperty');
+        $this->object->unexistingProperty;
     }
 
     /**
      * @covers PAF_Buffer_Memory::flush
-     * @todo Implement testFlush().
+     * @dataProvider flushProvider
      */
-    public function testFlush()
+    public function testFlush($content)
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $this->object->push($content);
+        $this->assertEquals($content, $this->object->get());
+        $this->assertEquals($content, $this->object->flush());
+        $this->assertEquals('', $this->object->get());
     }
 
-}
+    public function flushProvider()
+    {
+        return $this->pullProvider();
+    }
 
-?>
+    /**
+     * @covers PAF_Buffer_Memory::__get
+     */
+    public function testId()
+    {
+        $ids = array();
+        
+        for ($i = 0;$i < 10;$i++)
+        {
+            $object = new PAF_Buffer_Memory();
+            $id = $object->id;
+            $this->assertNotContains($id, $ids);
+            $ids[] = $id;
+        }
+    }
+}

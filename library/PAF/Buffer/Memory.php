@@ -44,6 +44,12 @@ class PAF_Buffer_Memory implements PAF_Buffer_Interface, PAF_Buffer_AbleInterfac
         $this->_content = '';
     }
 
+    /**
+     * 
+     * @param string $content
+     * 
+     * @return void
+     */
     public function push($content)
     {
         if (isset($this->_buffer))
