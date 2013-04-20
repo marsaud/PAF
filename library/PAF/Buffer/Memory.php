@@ -73,7 +73,7 @@ class PAF_Buffer_Memory implements PAF_Buffer_Interface, PAF_Buffer_AbleInterfac
         {
             throw new PAF_Exception_NoSuchIdentifier('No ' . $id . ' in buffer stack.');
         }
-        elseif (NULL === $id || $this->_buffer->id == $id)
+        elseif (NULL === $id ||  $id == $this->_buffer->id)
         {
             $this->_buffer = NULL;
         }
@@ -89,7 +89,7 @@ class PAF_Buffer_Memory implements PAF_Buffer_Interface, PAF_Buffer_AbleInterfac
         {
             throw new PAF_Exception_NoSuchIdentifier('No ' . $id . ' in buffer stack.');
         }
-        elseif (NULL === $id || $id = $this->_buffer->id)
+        elseif (NULL === $id || $id == $this->_buffer->id)
         {
             $this->_pushDirect($this->_buffer->flush());
         }
@@ -105,7 +105,7 @@ class PAF_Buffer_Memory implements PAF_Buffer_Interface, PAF_Buffer_AbleInterfac
         {
             throw new PAF_Exception_NoSuchIdentifier('No ' . $id . ' in buffer stack.');
         }
-        elseif (NULL === $id || $this->_buffer->id == $id)
+        elseif (NULL === $id ||  $id == $this->_buffer->id)
         {
             return $this->_buffer->get();
         }
@@ -117,7 +117,11 @@ class PAF_Buffer_Memory implements PAF_Buffer_Interface, PAF_Buffer_AbleInterfac
 
     public function pull($length = NULL, $piece = PAF_Buffer_Interface::LINE)
     {
-        if (PAF_Buffer_Interface::BYTE === $piece)
+        if (isset($this->_buffer))
+        {
+            return $this->pull($length, $piece);
+        }
+        elseif (PAF_Buffer_Interface::BYTE === $piece)
         {
             return $this->_pullBytes($length);
         }
@@ -127,7 +131,7 @@ class PAF_Buffer_Memory implements PAF_Buffer_Interface, PAF_Buffer_AbleInterfac
         }
         else
         {
-            throw new PAF_Exception_IllegalArgument('Unknown piece type "' . $piece . '" fro pulling.');
+            throw new PAF_Exception_IllegalArgument('Unknown piece type "' . $piece . '" for pulling.');
         }
     }
 

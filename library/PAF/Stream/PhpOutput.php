@@ -12,13 +12,14 @@
  */
 class PAF_Stream_PhpOutput implements PAF_Stream_Interface
 {
+
     /**
      * @todo IMBRICATED BUFFER MANAGER
      *
      * @var type 
      */
     protected $_buffer;
-    
+
     public function close()
     {
         return;
@@ -61,4 +62,15 @@ class PAF_Stream_PhpOutput implements PAF_Stream_Interface
     {
         
     }
+
+    public function get($length = NULL, $piece = PAF_Stream_Interface::LINE)
+    {
+        
+    }
+
+    public function put($content)
+    {
+        
+    }
+
 }
