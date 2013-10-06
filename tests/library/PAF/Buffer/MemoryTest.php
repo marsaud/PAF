@@ -1,6 +1,9 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../../../library/PAF/Buffer/Memory.php';
+//require_once 'PAF/Buffer/Interface.php';
+//require_once 'PAF/Buffer/AbleInterface.php';
+//require_once 'PAF/Buffer/MemorySimple.php';
+//require_once 'PAF/Buffer/Memory.php';
 
 /**
  * Test class for PAF_Buffer_Memory.
@@ -60,6 +63,35 @@ class PAF_Buffer_MemoryTest extends PHPUnit_Framework_TestCase
         $data[] = array('', '', '');
 
         return $data;
+    }
+
+    /**
+     * @covers PAF_Buffer_Memory::startBuffer
+     * @todo Implement testStartBuffer().
+     */
+    public function testStartBuffer()
+    {
+        $object = new PAF_Buffer_Memory();
+        $this->assertNull($object->getBuffer());
+        
+        $idOne = $object->startBuffer();
+        $this->assertEquals('', $object->getBuffer());
+        $this->assertEquals('', $object->getBuffer($idOne));
+        
+        $object->push('PUSHONE;');
+        $this->assertEquals('PUSHONE;', $object->getBuffer());
+        $this->assertEquals('PUSHONE;', $object->getBuffer($idOne));
+        
+        $idTwo = $object->startBuffer();
+        $this->assertEquals('', $object->getBuffer());
+        $this->assertEquals('', $object->getBuffer($idTwo));
+        
+        $object->push('PUSHTWO;');
+        $this->assertEquals('PUSHTWO;', $object->getBuffer());
+        $this->assertEquals('PUSHTWO;', $object->getBuffer($idTwo));
+        $this->assertEquals('PUSHONE;', $object->getBuffer($idOne));
+        
+        
     }
 
     /**
@@ -141,18 +173,6 @@ class PAF_Buffer_MemoryTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers PAF_Buffer_Memory::startBuffer
-     * @todo Implement testStartBuffer().
-     */
-    public function testStartBuffer()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
-    }
-
-    /**
      * @covers PAF_Buffer_Memory::stopBuffer
      * @todo Implement testStopBuffer().
      */
@@ -196,8 +216,8 @@ class PAF_Buffer_MemoryTest extends PHPUnit_Framework_TestCase
     public function testId()
     {
         $ids = array();
-        
-        for ($i = 0;$i < 10;$i++)
+
+        for ($i = 0; $i < 10; $i++)
         {
             $object = new PAF_Buffer_Memory();
             $id = $object->id;
@@ -205,4 +225,5 @@ class PAF_Buffer_MemoryTest extends PHPUnit_Framework_TestCase
             $ids[] = $id;
         }
     }
+
 }

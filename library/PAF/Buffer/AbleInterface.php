@@ -12,7 +12,7 @@
 interface PAF_Buffer_AbleInterface
 {
 
-    public function startBuffer();
+    public function startBuffer($type = NULL);
 
     public function stopBuffer($id = NULL);
 
@@ -21,4 +21,6 @@ interface PAF_Buffer_AbleInterface
     public function dropBuffer($id = NULL);
 
     public function flushBuffer($id = NULL);
+    
+    public function hasBuffer();
 }

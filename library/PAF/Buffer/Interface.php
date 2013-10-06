@@ -14,6 +14,8 @@ interface PAF_Buffer_Interface
 
     const BYTE = 'byte';
     const LINE = 'line';
+    const TYPE_MEMORY = 'Memory';
+    const TYPE_MEMORYSIMPLE = 'MemorySimple';
 
     public function push($content);
 

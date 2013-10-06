@@ -38,12 +38,14 @@ abstract class PAF_Object_Base
      * @var type
      */
     private $_initialized;
+
     /**
      * The readable properties
      *
      * @var string[]
      */
     protected $_readProperties = array();
+
     /**
      * The writable properties
      *
@@ -71,7 +73,7 @@ abstract class PAF_Object_Base
     protected function _extendReadProperties(array $properties)
     {
         $this->_readProperties = array_merge(
-            $this->_readProperties, $properties
+                $this->_readProperties, $properties
         );
     }
 
@@ -95,7 +97,7 @@ abstract class PAF_Object_Base
     protected function _extendWriteProperties(array $properties)
     {
         $this->_writeProperties = array_merge(
-            $this->_writeProperties, $properties
+                $this->_writeProperties, $properties
         );
     }
 
@@ -138,6 +140,7 @@ abstract class PAF_Object_Base
      */
     private function _initObject()
     {
+        self::_initCache();
         if (!$this->_initialized)
         {
             $this->_initProperties();
@@ -169,34 +172,41 @@ abstract class PAF_Object_Base
 
         if (!array_key_exists($name, $this->_readProperties))
         {
-            throw new PAF_Exception_NoSuchIdentifier(); // @todo
+            throw new PAF_Exception_NoSuchProperty(); // @todo
         }
 
-        self::_initCache();
         $class = get_class($this);
-        if ($accessor = $this->_accessorLookUp(
-            $class, $this->_readProperties[$name]
-        ))
+
+        $accessor = $this->_accessorLookUp(
+                $class, $this->_readProperties[$name]
+        );
+        if (false !== $accessor)
         {
-            return $this->{$accessor}();
-        }
-        elseif ($attribute = $this->_attributeLookUp(
-            $class, $this->_readProperties[$name]
-        ))
-        {
-            return $this->{$attribute};
+            $returnValue = $this->{$accessor}();
         }
         else
         {
-            throw new PAF_Exception_NoSuchProperty(); // @todo
+            $attribute = $this->_attributeLookUp(
+                    $class, $this->_readProperties[$name]
+            );
+            if (false !== $attribute)
+            {
+                $returnValue = $this->{$attribute};
+            }
+            else
+            {
+                throw new PAF_Exception_BrokenProperty(); // @todo
+            }
         }
+        
+        return $returnValue;
     }
 
     /**
      * This MAY be called by all sub-types when overriding __set.
      *
-     * @param type $name Property name.
-     * @param type $value Value to assign.
+     * @param string $name Property name.
+     * @param mixed $value Value to assign.
      *
      * @return void
      *
@@ -209,26 +219,31 @@ abstract class PAF_Object_Base
 
         if (!array_key_exists($name, $this->_writeProperties))
         {
-            throw new PAF_Exception_NoSuchIdentifier(); // @todo
+            throw new PAF_Exception_NoSuchProperty(); // @todo
         }
 
-        self::_initCache();
         $class = get_class($this);
-        if ($accessor = $this->_accessorLookUp(
-            $class, $this->_writeProperties[$name], true
-        ))
+
+        $accessor = $this->_accessorLookUp(
+                $class, $this->_writeProperties[$name], true
+        );
+        if (false !== $accessor)
         {
             $this->{$accessor}($value);
         }
-        elseif ($attribute = $this->_attributeLookUp(
-            $class, $this->_writeProperties[$name], true
-        ))
-        {
-            $this->{$attribute} = $value;
-        }
         else
         {
-            throw new PAF_Exception_NoSuchProperty(); // @todo
+            $attribute = $this->_attributeLookUp(
+                    $class, $this->_writeProperties[$name]
+            );
+            if (false !== $attribute)
+            {
+                $this->{$attribute} = $value;
+            }
+            else
+            {
+                throw new PAF_Exception_BrokenProperty(); // @todo
+            }
         }
     }
 
@@ -238,19 +253,17 @@ abstract class PAF_Object_Base
      *
      * @param string $class The type of the instance at work.
      * @param string $name The name to look for.
-     * @param boolean $forWrite Wether the property is accessed for reading or
-     * writing.
      *
      * @return string|boolean The final attribue name, or false.
      */
-    private function _attributeLookUp($class, $name, $forWrite = false)
+    private function _attributeLookUp($class, $name)
     {
         $id = $class . '_' . $name . '_att';
         if (!isset(self::$_cache->{$id}))
         {
             $attribs = get_class_vars($class);
             self::$_cache->{$id} =
-                array_key_exists('_' . $name, $attribs) ? '_' . $name : false;
+                    array_key_exists('_' . $name, $attribs) ? '_' . $name : false;
         }
 
         return self::$_cache->{$id};
@@ -276,7 +289,7 @@ abstract class PAF_Object_Base
         {
             $methods = get_class_methods($class);
             self::$_cache->{$id} =
-                in_array($method, $methods) ? $method : false;
+                    in_array($method, $methods) ? $method : false;
         }
 
         return self::$_cache->{$id};

@@ -1,7 +1,13 @@
 <?php
 
-require_once dirname(__FILE__) .
-    '/../../../../library/PAF/Controller/Abstract.php';
+//require_once 'PAF/Exception/Base.php';
+//require_once 'PAF/Exception/NoSuchAction.php';
+//require_once 'PAF/Exception/IllegalArgument.php';
+//require_once 'PAF/View/Interface.php';
+//require_once 'PAF/Container/Interface.php';
+//require_once 'PAF/Controller/Interface.php';
+//require_once 'PAF/Object/Base.php';
+//require_once 'PAF/Controller/Abstract.php';
 
 class TestControllerAbstract extends PAF_Controller_Abstract
 {
@@ -97,6 +103,7 @@ class PAF_Controller_AbstractTest extends PHPUnit_Framework_TestCase
         $data[] = array('doAction');
         $data[] = array('_');
         $data[] = array('_a');
+        $data[] = array('_actionForTest');
 
         return $data;
     }

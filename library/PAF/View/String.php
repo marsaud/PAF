@@ -30,7 +30,7 @@ class PAF_View_String implements PAF_View_Interface
 
     public function render()
     {
-        $this->_stream->push($this->_content);
+        $this->_stream->put($this->content);
         $this->drop();
     }
 
@@ -38,10 +38,20 @@ class PAF_View_String implements PAF_View_Interface
     {
         $this->_content .= (string) $content;
     }
+    
+    public function append($content)
+    {
+        return $this->push($content);
+    }
 
     public function unshift($content)
     {
         $this->_content = (string) $content . $this->_content;
+    }
+    
+    public function prepend($content)
+    {
+        return $this->unshift($content);
     }
 
     public function drop()

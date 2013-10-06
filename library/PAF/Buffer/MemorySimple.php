@@ -10,7 +10,7 @@
  *
  * @author fabrice
  */
-class PAF_Buffer_Memory_Simple implements PAF_Buffer_Interface
+class PAF_Buffer_MemorySimple extends PAF_Buffer_Abstract
 {
 
     /**
@@ -19,12 +19,13 @@ class PAF_Buffer_Memory_Simple implements PAF_Buffer_Interface
      */
     protected $_content;
 
-    public function __construct()
+    protected function _init()
     {
-        $this->_init();
+        parent::_init();
+        $this->_reset();
     }
 
-    protected function _init()
+    protected function _reset()
     {
         $this->_content = '';
     }
@@ -32,7 +33,7 @@ class PAF_Buffer_Memory_Simple implements PAF_Buffer_Interface
     public function flush()
     {
         $out = $this->get();
-        $this->_init();
+        $this->_reset();
         return $out;
     }
 
@@ -59,8 +60,7 @@ class PAF_Buffer_Memory_Simple implements PAF_Buffer_Interface
 
     protected function _pullBytes($length = NULL)
     {
-        NULL !== $length
-                || $length = strlen($this->_content);
+        NULL !== $length || $length = strlen($this->_content);
 
         $pulled = substr($this->_content, 0, $length);
         $kept = substr($this->_content, $length);
@@ -72,8 +72,7 @@ class PAF_Buffer_Memory_Simple implements PAF_Buffer_Interface
     {
         $lines = explode(PHP_EOL, $this->_content);
 
-        NULL !== $length
-                || $length = count($lines);
+        NULL !== $length || $length = count($lines);
 
         $pulled = array_slice($lines, 0, $length);
         $kept = array_slice($lines, $length);

@@ -8,7 +8,7 @@
 /**
  * Description of PAF_View_Abstract
  * 
- * USEFULL ?
+ * @todo USEFULL ?
  *
  * @author fabrice
  */

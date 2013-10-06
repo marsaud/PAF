@@ -1,9 +1,10 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../../../library/PAF/Object/Base.php';
-require_once dirname(__FILE__) . '/../../../../library/PAF/Exception/Base.php';
-require_once dirname(__FILE__) . '/../../../../library/PAF/Exception/NoSuchProperty.php';
-require_once dirname(__FILE__) . '/../../../../library/PAF/Exception/NoSuchIdentifier.php';
+//require_once dirname(__FILE__) . '/../../../../library/PAF/Object/Base.php';
+//require_once dirname(__FILE__) . '/../../../../library/PAF/Exception/Base.php';
+//require_once dirname(__FILE__) . '/../../../../library/PAF/Exception/NoSuchProperty.php';
+//require_once dirname(__FILE__) . '/../../../../library/PAF/Exception/NoSuchIdentifier.php';
+//require_once dirname(__FILE__) . '/../../../../library/PAF/Exception/BrokenProperty.php';
 
 /**
  * A sub-type that de-encapsulate a bit the data so we can verify state.
@@ -43,7 +44,7 @@ class TestObjectBase extends PAF_Object_Base
      *
      * @var mixed
      */
-        protected $_rwa, $_rwm, $_ra, $_rm, $_wa, $_wm;
+    protected $_rwa, $_rwm, $_ra, $_rm, $_wa, $_wm;
 
     protected function _getRwm()
     {
@@ -97,7 +98,7 @@ class TestObjectBase extends PAF_Object_Base
 
 class TestException extends Exception
 {
-
+    
 }
 
 /**
@@ -127,7 +128,7 @@ class PAF_Object_BaseTest extends PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-
+        
     }
 
     public function valueProvider()
@@ -160,6 +161,7 @@ class PAF_Object_BaseTest extends PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider valueProvider
+     * 
      * @covers PAF_Object_Base::__set
      * @covers PAF_Object_Base::__get
      * @covers PAF_Object_Base::<private>
@@ -173,6 +175,7 @@ class PAF_Object_BaseTest extends PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider valueProvider
+     * 
      * @covers PAF_Object_Base::__set
      * @covers PAF_Object_Base::__get
      * @covers PAF_Object_Base::<private>
@@ -186,6 +189,7 @@ class PAF_Object_BaseTest extends PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider errorProvider
+     * 
      * @covers PAF_Object_Base::__set
      * @covers PAF_Object_Base::<private>
      * @covers PAF_Object_Base::<protected>
@@ -198,26 +202,32 @@ class PAF_Object_BaseTest extends PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider valueProvider
+     * 
      * @covers PAF_Object_Base::__set
      * @covers PAF_Object_Base::<private>
      * @covers PAF_Object_Base::<protected>
      */
-    public function testWriteAttribute($value)
+    public function testWriteOnlyAttribute($value)
     {
         $this->object->writeAttribute = $value;
         $this->assertEquals($value, $this->object->verifiyWriteOnlyAttribute());
+        $this->setExpectedException('PAF_Exception_NoSuchProperty');
+        $this->object->writeAttribute;
     }
 
     /**
      * @dataProvider valueProvider
+     * 
      * @covers PAF_Object_Base::__set
      * @covers PAF_Object_Base::<private>
      * @covers PAF_Object_Base::<protected>
      */
-    public function testWriteMethod($value)
+    public function testWriteOnlyMethod($value)
     {
         $this->object->writeMethod = $value;
         $this->assertEquals($value, $this->object->verifyWriteOnlyMethod());
+        $this->setExpectedException('PAF_Exception_NoSuchProperty');
+        $this->object->writeMethod;
     }
 
     /**
@@ -242,6 +252,8 @@ class PAF_Object_BaseTest extends PHPUnit_Framework_TestCase
     {
         $this->object->assignReadOnlyAttribute($value);
         $this->assertEquals($value, $this->object->readAttribute);
+        $this->setExpectedException('PAF_Exception_NoSuchProperty');
+        $this->object->readAttribute = $value;
     }
 
     /**
@@ -254,29 +266,31 @@ class PAF_Object_BaseTest extends PHPUnit_Framework_TestCase
     {
         $this->object->assignReadOnlyMethod($value);
         $this->assertEquals($value, $this->object->readMethod);
+        $this->setExpectedException('PAF_Exception_NoSuchProperty');
+        $this->object->readMethod = $value;
     }
 
     public function testException1()
     {
-        $this->setExpectedException('PAF_Exception_NoSuchIdentifier');
+        $this->setExpectedException('PAF_Exception_NoSuchProperty');
         $this->object->noWriteProperty = 'any';
     }
 
     public function testException2()
     {
-        $this->setExpectedException('PAF_Exception_NoSuchIdentifier');
+        $this->setExpectedException('PAF_Exception_NoSuchProperty');
         $this->object->noReadProperty;
     }
 
     public function testException3()
     {
-        $this->setExpectedException('PAF_Exception_NoSuchProperty');
+        $this->setExpectedException('PAF_Exception_BrokenProperty');
         $this->object->brokenProperty = 'any';
     }
 
     public function testException4()
     {
-        $this->setExpectedException('PAF_Exception_NoSuchProperty');
+        $this->setExpectedException('PAF_Exception_BrokenProperty');
         $this->object->brokenProperty;
     }
 

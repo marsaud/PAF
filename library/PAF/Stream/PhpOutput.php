@@ -10,13 +10,12 @@
  *
  * @author fabrice
  */
-class PAF_Stream_PhpOutput implements PAF_Stream_Interface
+class PAF_Stream_PhpOutput implements PAF_Stream_Interface, PAF_Buffer_AbleInterface
 {
 
     /**
-     * @todo IMBRICATED BUFFER MANAGER
      *
-     * @var type 
+     * @var PAF_Buffer_Interface 
      */
     protected $_buffer;
 
@@ -25,7 +24,7 @@ class PAF_Stream_PhpOutput implements PAF_Stream_Interface
         return;
     }
 
-    public function dropBuffer($id)
+    public function dropBuffer($id = NULL)
     {
         
     }
@@ -35,7 +34,7 @@ class PAF_Stream_PhpOutput implements PAF_Stream_Interface
         
     }
 
-    public function getBuffer($id)
+    public function getBuffer($id = NULL)
     {
         
     }
@@ -45,20 +44,7 @@ class PAF_Stream_PhpOutput implements PAF_Stream_Interface
         return;
     }
 
-    public function pull()
-    {
-        
-    }
-
-    public function push($content)
-    {
-        /**
-         * @todo Handle Buffers
-         */
-        echo $content;
-    }
-
-    public function startBuffer()
+    public function startBuffer($type = PAF_Buffer_Interface::TYPE_MEMORY)
     {
         
     }
@@ -70,7 +56,24 @@ class PAF_Stream_PhpOutput implements PAF_Stream_Interface
 
     public function put($content)
     {
+        if ($this->hasBuffer())
+        {
+            $this->_buffer->push($content);
+        }
+        else
+        {
+            echo $content;
+        }
+    }
+
+    public function stopBuffer($id = NULL)
+    {
         
+    }
+
+    public function hasBuffer()
+    {
+        return NULL !== $this->_buffer;
     }
 
 }
