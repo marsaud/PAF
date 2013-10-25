@@ -172,7 +172,7 @@ abstract class PAF_Object_Base
 
         if (!array_key_exists($name, $this->_readProperties))
         {
-            throw new PAF_Exception_NoSuchProperty(); // @todo
+            throw new PAF_Exception_NoSuchProperty($name); // @todo
         }
 
         $class = get_class($this);
@@ -195,10 +195,10 @@ abstract class PAF_Object_Base
             }
             else
             {
-                throw new PAF_Exception_BrokenProperty(); // @todo
+                throw new PAF_Exception_BrokenProperty('(get)' . $name); // @todo
             }
         }
-        
+
         return $returnValue;
     }
 
@@ -219,7 +219,7 @@ abstract class PAF_Object_Base
 
         if (!array_key_exists($name, $this->_writeProperties))
         {
-            throw new PAF_Exception_NoSuchProperty(); // @todo
+            throw new PAF_Exception_NoSuchProperty($name); // @todo
         }
 
         $class = get_class($this);
@@ -242,7 +242,7 @@ abstract class PAF_Object_Base
             }
             else
             {
-                throw new PAF_Exception_BrokenProperty(); // @todo
+                throw new PAF_Exception_BrokenProperty('(set)' . $name); // @todo
             }
         }
     }
@@ -262,8 +262,7 @@ abstract class PAF_Object_Base
         if (!isset(self::$_cache->{$id}))
         {
             $attribs = get_class_vars($class);
-            self::$_cache->{$id} =
-                    array_key_exists('_' . $name, $attribs) ? '_' . $name : false;
+            self::$_cache->{$id} = array_key_exists('_' . $name, $attribs) ? '_' . $name : false;
         }
 
         return self::$_cache->{$id};
@@ -288,8 +287,7 @@ abstract class PAF_Object_Base
         if (!isset(self::$_cache->{$id}))
         {
             $methods = get_class_methods($class);
-            self::$_cache->{$id} =
-                    in_array($method, $methods) ? $method : false;
+            self::$_cache->{$id} = in_array($method, $methods) ? $method : false;
         }
 
         return self::$_cache->{$id};

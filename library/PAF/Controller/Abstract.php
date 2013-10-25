@@ -9,7 +9,7 @@
  *
  * @property PAF_View_Interface $view A view linked with the current controller.
  * @property PAF_Container_Interface $container A container the controller
- * may ask for resoures.
+ * may ask for resources.
  *
  * @author fabrice
  */
@@ -64,7 +64,7 @@ PAF_Controller_Interface
 
         if (!in_array($actionName, $methods))
         {
-            throw new PAF_Exception_NoSuchAction();
+            throw new PAF_Exception_NoSuchAction($actionName);
         }
 
         $args = func_get_args();

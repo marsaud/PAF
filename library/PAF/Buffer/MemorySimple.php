@@ -21,7 +21,6 @@ class PAF_Buffer_MemorySimple extends PAF_Buffer_Abstract
 
     protected function _init()
     {
-        parent::_init();
         $this->_reset();
     }
 

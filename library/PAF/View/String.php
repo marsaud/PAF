@@ -12,70 +12,117 @@
  * 
  * @property-read string $content The string content prepared for rendering
  */
-class PAF_View_String implements PAF_View_Interface
+final class PAF_View_String extends PAF_View_Abstract
 {
-
+    const DEFAULT_CONTENT = '';
+    
     /**
      *
      * @var string
      */
     protected $_content = '';
-    
-    protected $_stream;
-    
-    public function __construct()
+
+    /**
+     * 
+     * @param string $content
+     * @param PAF_Stream_Interface $stream
+     */
+    public function __construct($content = self::DEFAULT_CONTENT, $stream = self::DEFAULT_STREAM)
     {
-        $this->_stream = new PAF_Stream_PhpOutput();
+        parent::__construct($stream);
+        $this->push($content);
     }
 
+    /**
+     * 
+     * @return void
+     */
+    protected function _initDefaultStream()
+    {
+        $this->_setStream(new PAF_Stream_PhpOutput());
+    }
+
+    /**
+     * 
+     * @return void
+     */
+    protected function _initProperties()
+    {
+        parent::_initProperties();
+
+        $this->_extendReadProperties(array(
+            'content' => 'content'
+        ));
+    }
+
+    /**
+     * 
+     * @return void
+     */
     public function render()
     {
-        $this->_stream->put($this->content);
+        $this->_getStream()->put($this->content);
         $this->drop();
     }
 
+    /**
+     * 
+     * @param string $content
+     * 
+     * @return void
+     */
     public function push($content)
     {
         $this->_content .= (string) $content;
     }
-    
+
+    /**
+     * 
+     * @param string $content
+     * 
+     * @return void
+     */
     public function append($content)
     {
-        return $this->push($content);
+        $this->push($content);
     }
 
+    /**
+     * 
+     * @param string $content
+     * 
+     * @return void
+     */
     public function unshift($content)
     {
         $this->_content = (string) $content . $this->_content;
     }
-    
+
+    /**
+     * 
+     * @param string $content
+     */
     public function prepend($content)
     {
-        return $this->unshift($content);
+        $this->unshift($content);
     }
 
+    /**
+     * 
+     * @return void
+     */
     public function drop()
     {
         $this->_content = '';
     }
 
-    public function __get($name)
-    {
-        if ('content' === $name)
-        {
-            return $this->_content;
-        }
-        else
-        {
-            throw new PAF_Exception_NoSuchProperty(
-                    __CLASS__ . ' has no ' . $name . ' read property.'
-                    );
-        }
-    }
-
+    /**
+     * 
+     * @return string
+     */
     public function __toString()
     {
-        return $this->content;
+        return $this->_content;
     }
 
 }

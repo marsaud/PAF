@@ -11,16 +11,43 @@
  */
 interface PAF_Buffer_AbleInterface
 {
+    /**
+     * Creates buffer
+     * 
+     * @return void
+     */
+    public function startBuffer();
 
-    public function startBuffer($type = NULL);
+    /**
+     * Destroys buffer
+     * 
+     * @return string Buffer's last content
+     */
+    public function stopBuffer();
 
-    public function stopBuffer($id = NULL);
+    /**
+     * @return string Buffer's content
+     */
+    public function getBuffer();
 
-    public function getBuffer($id = NULL);
+    /**
+     * Destroys buffer
+     * 
+     * @return void
+     */
+    public function dropBuffer();
 
-    public function dropBuffer($id = NULL);
-
-    public function flushBuffer($id = NULL);
+    /**
+     * Buffer's content goes where it had to go if not being buffered.
+     * 
+     * @return void
+     */
+    public function flushBuffer();
     
+    /**
+     * Wether a buffer exists or not
+     * 
+     * @return boolean
+     */
     public function hasBuffer();
 }

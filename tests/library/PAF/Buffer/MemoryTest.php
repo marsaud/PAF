@@ -37,14 +37,23 @@ class PAF_Buffer_MemoryTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers PAF_Buffer_Memory::push
+     * @covers PAF_Buffer_Memory::<protected>
      * @dataProvider pushProvider
      */
     public function testPush($first, $second, $all)
     {
+        $this->assertEquals('', $this->object->get());
         $this->object->push($first);
         $this->assertEquals($first, $this->object->get());
         $this->object->push($second);
         $this->assertEquals($all, $this->object->get());
+        
+        $this->object->startBuffer();
+        $this->assertEquals('', $this->object->getBuffer());
+        $this->object->push($first);
+        $this->assertEquals($first, $this->object->getBuffer());
+        $this->object->push($second);
+        $this->assertEquals($all, $this->object->getBuffer());
     }
 
     public function pushProvider()
@@ -67,67 +76,161 @@ class PAF_Buffer_MemoryTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers PAF_Buffer_Memory::startBuffer
-     * @todo Implement testStartBuffer().
      */
     public function testStartBuffer()
     {
-        $object = new PAF_Buffer_Memory();
-        $this->assertNull($object->getBuffer());
-        
-        $idOne = $object->startBuffer();
-        $this->assertEquals('', $object->getBuffer());
-        $this->assertEquals('', $object->getBuffer($idOne));
-        
-        $object->push('PUSHONE;');
-        $this->assertEquals('PUSHONE;', $object->getBuffer());
-        $this->assertEquals('PUSHONE;', $object->getBuffer($idOne));
-        
-        $idTwo = $object->startBuffer();
-        $this->assertEquals('', $object->getBuffer());
-        $this->assertEquals('', $object->getBuffer($idTwo));
-        
-        $object->push('PUSHTWO;');
-        $this->assertEquals('PUSHTWO;', $object->getBuffer());
-        $this->assertEquals('PUSHTWO;', $object->getBuffer($idTwo));
-        $this->assertEquals('PUSHONE;', $object->getBuffer($idOne));
-        
-        
+        $this->assertFalse($this->object->hasBuffer());
+//        try
+//        {
+//            $this->object->stopBuffer();
+//            $this->fail();
+//        }
+//        catch (Exception $exc)
+//        {
+//            $this->assertInstanceOf('PAF_Exception_NoSuchResource', $exc);
+//        }
+
+        $this->object->startBuffer();
+        $this->assertTrue($this->object->hasBuffer());
+        $this->object->stopBuffer();
+        $this->assertFalse($this->object->hasBuffer());
+//        try
+//        {
+//            $this->object->stopBuffer();
+//            $this->fail();
+//        }
+//        catch (Exception $exc)
+//        {
+//            $this->assertInstanceOf('PAF_Exception_NoSuchResource', $exc);
+//        }
+
+        $this->object->startBuffer();
+        $this->assertTrue($this->object->hasBuffer());
+        $this->object->startBuffer();
+        $this->assertTrue($this->object->hasBuffer());
+        $this->object->stopBuffer();
+        $this->assertTrue($this->object->hasBuffer());
+        $this->object->stopBuffer();
+        $this->assertFalse($this->object->hasBuffer());
+//        try
+//        {
+//            $this->object->stopBuffer();
+//            $this->fail();
+//        }
+//        catch (Exception $exc)
+//        {
+//            $this->assertInstanceOf('PAF_Exception_NoSuchResource', $exc);
+//        }
     }
 
     /**
      * @covers PAF_Buffer_Memory::dropBuffer
-     * @todo Implement testDropBuffer().
      */
     public function testDropBuffer()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $this->assertFalse($this->object->hasBuffer());
+        try
+        {
+            $this->object->dropBuffer();
+            $this->fail();
+        }
+        catch (Exception $exc)
+        {
+            $this->assertInstanceOf('PAF_Exception_NoSuchResource', $exc);
+        }
+
+        $this->object->startBuffer();
+        $this->object->push('This is going to be dropped');
+        $this->object->dropBuffer();
+        $this->assertEquals('', $this->object->get());
+        $this->assertFalse($this->object->hasBuffer());
+//        try
+//        {
+//            $this->object->dropBuffer();
+//            $this->fail();
+//        }
+//        catch (Exception $exc)
+//        {
+//            $this->assertInstanceOf('PAF_Exception_NoSuchResource', $exc);
+//        }
+
+        $this->object->startBuffer();
+        $this->object->push('This is going to be dropped too');
+        $this->object->startBuffer();
+        $this->object->push('This is going to be dropped again and again');
+        $this->object->dropBuffer();
+        $this->object->dropBuffer();
+        $this->assertEquals('', $this->object->get());
+        $this->assertFalse($this->object->hasBuffer());
+//        try
+//        {
+//            $this->object->dropBuffer();
+//            $this->fail();
+//        }
+//        catch (Exception $exc)
+//        {
+//            $this->assertInstanceOf('PAF_Exception_NoSuchResource', $exc);
+//        }
     }
 
     /**
      * @covers PAF_Buffer_Memory::flushBuffer
-     * @todo Implement testFlushBuffer().
      */
     public function testFlushBuffer()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $this->object->startBuffer();
+        $this->object->push('PUSHONE;');
+        $this->assertEquals('', $this->object->get());
+        $this->assertEquals('PUSHONE;', $this->object->getBuffer());
+        
+        $this->object->startBuffer();
+        $this->object->push('PUSHTWO;');
+        $this->assertEquals('PUSHTWO;', $this->object->getBuffer());
+        $this->object->flushBuffer();
+        $this->assertEquals('', $this->object->getBuffer());
+        $this->object->stopBuffer();
+        $this->assertEquals('PUSHONE;PUSHTWO;', $this->object->getBuffer());
+    }
+    
+    /**
+     * @covers PAF_Buffer_Memory::flushBuffer
+     */
+    public function testFlushBufferException()
+    {
+        $this->setExpectedException('PAF_Exception_NoSuchResource');
+        $this->object->flushBuffer();
     }
 
     /**
      * @covers PAF_Buffer_Memory::getBuffer
-     * @todo Implement testGetBuffer().
      */
     public function testGetBuffer()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $this->object->startBuffer();
+        $this->assertEquals('', $this->object->getBuffer());
+        $this->object->push('PUSHONE;');
+        $this->assertEquals('PUSHONE;', $this->object->getBuffer());
+        $this->object->push('PUSHTWO;');
+        $this->assertEquals('PUSHONE;PUSHTWO;', $this->object->getBuffer());
+        
+        $this->object->startBuffer();
+        $this->assertEquals('', $this->object->getBuffer());
+        $this->object->push('PUSHTHREE;');
+        $this->assertEquals('PUSHTHREE;', $this->object->getBuffer());
+        $this->object->push('PUSHFOUR;');
+        $this->assertEquals('PUSHTHREE;PUSHFOUR;', $this->object->getBuffer());
+        
+        $this->object->stopBuffer();
+        $this->assertEquals('PUSHONE;PUSHTWO;', $this->object->getBuffer());
+    }
+    
+    /**
+     * @covers PAF_Buffer_Memory::getBuffer
+     */
+    public function testGetBufferException()
+    {
+        $this->setExpectedException('PAF_Exception_NoSuchResource');
+        $this->object->getBuffer();
     }
 
     /**
@@ -138,6 +241,17 @@ class PAF_Buffer_MemoryTest extends PHPUnit_Framework_TestCase
     {
         $this->object->push($content);
         $this->assertEquals($content, $this->object->get());
+        
+        $this->object->startBuffer();
+        $this->object->push($content);
+        $this->assertEquals($content, $this->object->get());
+        $this->assertEquals($content, $this->object->getBuffer());
+        
+        $this->assertEquals($content, $this->object->pull());
+        $this->assertEquals('', $this->object->getBuffer());
+        $this->assertEquals($content, $this->object->get());
+        
+        $this->object->stopBuffer();
         $this->assertEquals($content, $this->object->pull());
         $this->assertEquals('', $this->object->get());
     }
@@ -174,14 +288,32 @@ class PAF_Buffer_MemoryTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers PAF_Buffer_Memory::stopBuffer
-     * @todo Implement testStopBuffer().
+     * @covers PAF_Buffer_Memory::<protected>
      */
     public function testStopBuffer()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $this->object->startBuffer();
+        $this->object->push('PUSHONE;');
+        $this->assertEquals('', $this->object->get());
+        
+        $this->object->startBuffer();
+        $this->object->push('PUSHTWO;');
+        $this->assertEquals('PUSHTWO;', $this->object->getBuffer());
+        $this->assertEquals('PUSHTWO;', $this->object->stopBuffer());
+        $this->assertEquals('PUSHONE;', $this->object->getBuffer());
+        
+        $this->assertEquals('PUSHONE;', $this->object->stopBuffer());
+        $this->object->push('PUSHTHREE;');
+        $this->assertEquals('PUSHTHREE;', $this->object->get());
+    }
+    
+        /**
+     * @covers PAF_Buffer_Memory::stopBuffer
+     */
+    public function testStopBufferException()
+    {
+        $this->setExpectedException('PAF_Exception_NoSuchResource');
+        $this->object->stopBuffer();
     }
 
     /**
@@ -226,4 +358,15 @@ class PAF_Buffer_MemoryTest extends PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @covers PAF_Buffer_Memory::hasBuffer
+     */
+    public function testHasBuffer()
+    {
+        $this->assertFalse($this->object->hasBuffer());
+        $this->object->startBuffer();
+        $this->assertTrue($this->object->hasBuffer());
+        $this->object->stopBuffer();
+        $this->assertFalse($this->object->hasBuffer());
+    }
 }

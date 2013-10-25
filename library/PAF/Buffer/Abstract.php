@@ -27,13 +27,19 @@ abstract class PAF_Buffer_Abstract implements PAF_Buffer_Interface
         $this->_init();
     }
 
-    protected function _init()
-    {
-        
-    }
+    /**
+     * @codeCoverageIgnore
+     */
+    abstract protected function _init();
 
+    /**
+     * @codeCoverageIgnore
+     */
     abstract public function flush();
 
+    /**
+     * @codeCoverageIgnore
+     */
     abstract public function get();
 
     public function getId()
@@ -41,8 +47,14 @@ abstract class PAF_Buffer_Abstract implements PAF_Buffer_Interface
         return $this->id;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     abstract public function pull($length = NULL, $piece = PAF_Buffer_Interface::LINE);
 
+    /**
+     * @codeCoverageIgnore
+     */
     abstract public function push($content);
 
     public function __get($name)

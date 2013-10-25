@@ -29,7 +29,7 @@ class PAF_Buffer_Manager
     {
         if (!in_array($type, self::$_types))
         {
-            throw new PAF_Exception_UnexistingBufferType();
+            throw new PAF_Exception_IllegalArgument('Unexisting buffer type');
         }
     }
 
@@ -37,35 +37,37 @@ class PAF_Buffer_Manager
     {
         if ($buffer instanceof PAF_Buffer_AbleInterface)
         {
-            return $buffer->startBuffer($type);
+            $buffer->startBuffer($type);
         }
         else
         {
-            throw new PAF_Exception_NoBufferAvailable(); // @todo
+            throw new PAF_Exception_MissingResource('No buffer available');
         }
     }
 
-    public static function drop(PAF_Buffer_Interface $buffer, $id)
+    public static function drop(PAF_Buffer_Interface $buffer)
     {
-        if ($buffer->getId() == $id)
+        if ($buffer instanceof PAF_Buffer_AbleInterface && $buffer->hasBuffer())
         {
-            return NULL;
-        }
-        elseif (!$buffer instanceof PAF_Buffer_AbleInterface)
-        {
-            if (NULL === $id)
-            {
-                return NULL;
-            }
-            else
-            {
-                throw new PAF_Exception_NoSuchResource();
-            }
+            return $buffer->dropBuffer();
         }
         else
         {
-            $buffer->dropBuffer($id);
+            return NULL;
+        }
+    }
+    
+    public static function stop(PAF_Buffer_Interface $buffer, &$content)
+    {
+        if ($buffer instanceof PAF_Buffer_AbleInterface && $buffer->hasBuffer())
+        {
+            $content = $buffer->stopBuffer();
             return $buffer;
+        }
+        else
+        {
+            $content = $buffer->get();
+            return NULL;
         }
     }
 

@@ -10,7 +10,7 @@
  *
  * @author fabrice
  */
-class PAF_Stream_PhpOutput implements PAF_Stream_Interface, PAF_Buffer_AbleInterface
+final class PAF_Stream_PhpOutput implements PAF_Stream_Interface, PAF_Buffer_AbleInterface
 {
 
     /**
@@ -24,19 +24,40 @@ class PAF_Stream_PhpOutput implements PAF_Stream_Interface, PAF_Buffer_AbleInter
         return;
     }
 
-    public function dropBuffer($id = NULL)
+    public function dropBuffer()
     {
-        
+        if (!$this->hasBuffer())
+        {
+            throw new PAF_Exception_NoSuchResource();
+        }
+        else
+        {
+            $this->_buffer = PAF_Buffer_Manager::drop($this->_buffer);
+        }
     }
 
-    public function flushBuffer($id = NULL)
+    public function flushBuffer()
     {
-        
+        if (!$this->hasBuffer())
+        {
+            throw new PAF_Exception_NoSuchResource();
+        }
+        else
+        {
+            $this->_putDirect($this->_buffer->flush());
+        }
     }
 
-    public function getBuffer($id = NULL)
+    public function getBuffer()
     {
-        
+        if (!$this->hasBuffer())
+        {
+            throw new PAF_Exception_NoSuchResource();
+        }
+        else
+        {
+            return $this->_buffer->get();
+        }
     }
 
     public function open()
@@ -46,12 +67,19 @@ class PAF_Stream_PhpOutput implements PAF_Stream_Interface, PAF_Buffer_AbleInter
 
     public function startBuffer($type = PAF_Buffer_Interface::TYPE_MEMORY)
     {
-        
+        if (!$this->hasBuffer())
+        {
+            $this->_buffer = PAF_Buffer_Manager::factory($type);
+        }
+        else
+        {
+            PAF_Buffer_Manager::start($this->_buffer, $type);
+        }
     }
 
     public function get($length = NULL, $piece = PAF_Stream_Interface::LINE)
     {
-        
+        throw new PAF_Exception_NoImplementation();
     }
 
     public function put($content)
@@ -62,13 +90,27 @@ class PAF_Stream_PhpOutput implements PAF_Stream_Interface, PAF_Buffer_AbleInter
         }
         else
         {
-            echo $content;
+            $this->_putDirect($content);
         }
     }
 
-    public function stopBuffer($id = NULL)
+    public function _putDirect($content)
     {
-        
+        echo $content;
+    }
+
+    public function stopBuffer()
+    {
+        if (!$this->hasBuffer())
+        {
+            throw new PAF_Exception_NoSuchResource ();
+        }
+        else
+        {
+            $content = NULL;
+            $this->_buffer = PAF_Buffer_Manager::stop($this->_buffer, $content);
+            return $content;
+        }
     }
 
     public function hasBuffer()

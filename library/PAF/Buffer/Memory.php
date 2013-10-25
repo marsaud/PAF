@@ -47,14 +47,19 @@ class PAF_Buffer_Memory extends PAF_Buffer_Abstract implements PAF_Buffer_AbleIn
      */
     public function push($content)
     {
-        if (isset($this->_buffer))
+        if ($this->hasBuffer())
         {
-            $this->_buffer->push($content);
+            $this->_pushToBuffer($content);
         }
         else
         {
             $this->_pushDirect($content);
         }
+    }
+    
+    protected function _pushToBuffer($content)
+    {
+        $this->_buffer->push($content);
     }
 
     /**
@@ -70,49 +75,47 @@ class PAF_Buffer_Memory extends PAF_Buffer_Abstract implements PAF_Buffer_AbleIn
 
     /**
      * 
-     * @param string $id
+     * @return PAF_Buffer_Memory
      * 
-     * @return void
-     * 
-     * @throws PAF_Exception_NoSuchIdentifier
+     * @throws PAF_Exception_NoSuchResource
      */
-    public function dropBuffer($id = NULL)
+    public function dropBuffer()
     {
-        if (!isset($this->_buffer))
+        if (!$this->hasBuffer())
         {
-            throw new PAF_Exception_NoSuchIdentifier('No ' . $id . ' in buffer stack.');
+            throw new PAF_Exception_NoSuchResource();
         }
-        elseif (NULL === $id || $id == $this->_buffer->id)
+        elseif ($this->_buffer->hasBuffer())
         {
-            $this->_buffer = NULL;
+            $this->_buffer->dropBuffer();
+            return $this;
         }
         else
         {
-            $this->_buffer->dropBuffer($id);
+            $this->_buffer = NULL;
+            return $this;
         }
     }
 
     /**
      * 
-     * @param string $id
-     * 
      * @return void
      * 
      * @throws PAF_Exception_NoSuchIdentifier
      */
-    public function flushBuffer($id = NULL)
+    public function flushBuffer()
     {
-        if (!isset($this->_buffer))
+        if (!$this->hasBuffer())
         {
-            throw new PAF_Exception_NoSuchIdentifier('No ' . $id . ' in buffer stack.');
+            throw new PAF_Exception_NoSuchResource();
         }
-        elseif (NULL === $id || $id == $this->_buffer->id)
+        elseif ($this->_buffer->hasBuffer())
         {
-            $this->_pushDirect($this->_buffer->flush());
+            $this->_buffer->flushBuffer();
         }
         else
         {
-            $this->_buffer->flushBuffer($id);
+            $this->_pushDirect($this->_buffer->flush());
         }
     }
 
@@ -124,19 +127,19 @@ class PAF_Buffer_Memory extends PAF_Buffer_Abstract implements PAF_Buffer_AbleIn
      * 
      * @throws PAF_Exception_NoSuchIdentifier
      */
-    public function getBuffer($id = NULL)
+    public function getBuffer()
     {
-        if (!isset($this->_buffer))
+        if (!$this->hasBuffer())
         {
-            throw new PAF_Exception_NoSuchResource('No ' . $id . ' in buffer stack.');
+            throw new PAF_Exception_NoSuchResource();
         }
-        elseif (NULL === $id || $id == $this->_buffer->id)
+        elseif ($this->_buffer->hasBuffer())
         {
-            return $this->_buffer->get();
+            return $this->_buffer->getBuffer();
         }
         else
         {
-            return $this->_buffer->getBuffer($id);
+            return $this->_buffer->get();
         }
     }
 
@@ -151,7 +154,7 @@ class PAF_Buffer_Memory extends PAF_Buffer_Abstract implements PAF_Buffer_AbleIn
      */
     public function pull($length = NULL, $piece = PAF_Buffer_Interface::LINE)
     {
-        if (isset($this->_buffer))
+        if ($this->hasBuffer())
         {
             return $this->_buffer->pull($length, $piece);
         }
@@ -163,8 +166,6 @@ class PAF_Buffer_Memory extends PAF_Buffer_Abstract implements PAF_Buffer_AbleIn
 
     /**
      * 
-     * @todo What must we exactly do here ?
-     * 
      * @return string
      */
     public function get()
@@ -174,14 +175,13 @@ class PAF_Buffer_Memory extends PAF_Buffer_Abstract implements PAF_Buffer_AbleIn
 
     /**
      * 
-     * @return string
+     * @return void
      */
     public function startBuffer($type = PAF_Buffer_Interface::TYPE_MEMORY)
     {
-        if (!isset($this->_buffer))
+        if (!$this->hasBuffer())
         {
             $this->_buffer = PAF_Buffer_Manager::factory($type);
-            return $this->_buffer->id;
         }
         else
         {
@@ -197,21 +197,21 @@ class PAF_Buffer_Memory extends PAF_Buffer_Abstract implements PAF_Buffer_AbleIn
      * 
      * @throws PAF_Exception_NoSuchIdentifier
      */
-    public function stopBuffer($id = NULL)
+    public function stopBuffer()
     {
-        if (!isset($this->_buffer))
+        if (!$this->hasBuffer())
         {
-            throw new PAF_Exception_NoSuchIdentifier('No ' . $id . ' in buffer stack.');
+            throw new PAF_Exception_NoSuchResource();
         }
-        elseif (NULL === $id || $id == $this->_buffer->id)
+        elseif ($this->_buffer->hasBuffer())
         {
-            $out = $this->getBuffer();
-            $this->dropBuffer();
-            return $out;
+            return $this->_buffer->stopBuffer();
         }
         else
         {
-            return $this->_buffer->stopBuffer($id);
+            $output = $this->_buffer->get();
+            $this->_buffer = NULL;
+            return $output;
         }
     }
 
@@ -221,19 +221,16 @@ class PAF_Buffer_Memory extends PAF_Buffer_Abstract implements PAF_Buffer_AbleIn
      */
     public function flush()
     {
-        if (isset($this->_buffer))
-        {
-            $this->_pushDirect($this->_buffer->flush());
-        }
-
-        $out = $this->get();
-        $this->_init();
-        return $out;
+        return $this->_b->flush();
     }
     
+    /**
+     * 
+     * @return boolean
+     */
     public function hasBuffer()
     {
-        return NULL !== $this->_buffer;
+        return (NULL !== $this->_buffer);
     }
 
 

@@ -6,11 +6,11 @@
  */
 
 /**
- * Description of PAF_Exception_NoBufferAvailable
+ * Description of PAF_Exception_NoImplementation
  *
  * @author fabrice
  */
-class PAF_Exception_NoBufferAvailable extends PAF_Exception_Base
+class PAF_Exception_NoImplementation extends PAF_Exception_Base
 {
     
 }
