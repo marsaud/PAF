@@ -13,10 +13,7 @@
  * @author fabrice
  */
 abstract class PAF_View_Abstract extends PAF_Object_Base implements PAF_View_Interface
-{
-
-    const DEFAULT_STREAM = NULL;
-    
+{   
     /**
      *
      * @var PAF_Stream_Interface
@@ -39,11 +36,11 @@ abstract class PAF_View_Abstract extends PAF_Object_Base implements PAF_View_Int
      * 
      * @param PAF_Stream_Interface $stream
      */
-    public function __construct($stream = self::DEFAULT_STREAM)
+    public function __construct(PAF_Stream_Interface $stream = NULL)
     {
         parent::__construct();
 
-        if (self::DEFAULT_STREAM !== $stream)
+        if (NULL !== $stream)
         {
             $this->_setStream($stream);
         }

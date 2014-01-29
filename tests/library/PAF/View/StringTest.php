@@ -37,7 +37,21 @@ class PAF_View_StringTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers PAF_View_Abstract::__construct
+     * @covers PAF_View_Abstract::<protected>
+     */
+    public function testConstructor()
+    {
+        $stream = new PAF_Stream_PhpOutput();
+        $object = new PAF_View_String('testConstructor', $stream);
+        
+        $this->assertSame($stream, $object->stream);
+        $this->assertEquals('testConstructor', $object->content);
+    }
+    
+    /**
      * @covers PAF_View_String::render
+     * @covers PAF_View_Abstract::render
      * @dataProvider renderProvider
      */
     public function testRender($content)

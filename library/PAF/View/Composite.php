@@ -27,7 +27,7 @@ class PAF_View_Composite extends PAF_View_Template
      * @param string $template
      * @param PAF_Stream_Interface $stream
      */
-    public function __construct($template = self::NO_TEMPLATE, $stream = self::DEFAULT_STREAM)
+    public function __construct($template = self::NO_TEMPLATE, PAF_Stream_Interface $stream = NULL)
     {
         parent::__construct($template, $stream);
         $this->_components = new ArrayObject();

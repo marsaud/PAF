@@ -27,7 +27,7 @@ final class PAF_View_String extends PAF_View_Abstract
      * @param string $content
      * @param PAF_Stream_Interface $stream
      */
-    public function __construct($content = self::DEFAULT_CONTENT, $stream = self::DEFAULT_STREAM)
+    public function __construct($content = self::DEFAULT_CONTENT, PAF_Stream_Interface $stream = NULL)
     {
         parent::__construct($stream);
         $this->push($content);

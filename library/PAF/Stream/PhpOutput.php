@@ -94,7 +94,7 @@ final class PAF_Stream_PhpOutput implements PAF_Stream_Interface, PAF_Buffer_Abl
         }
     }
 
-    public function _putDirect($content)
+    protected function _putDirect($content)
     {
         echo $content;
     }

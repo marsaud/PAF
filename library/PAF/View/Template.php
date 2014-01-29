@@ -35,7 +35,7 @@ class PAF_View_Template extends PAF_View_Abstract
      * @param string $template
      * @param PAF_Stream_Interface $stream
      */
-    public function __construct($template = self::NO_TEMPLATE, $stream = self::DEFAULT_STREAM)
+    public function __construct($template = self::NO_TEMPLATE, PAF_Stream_Interface $stream = NULL)
     {
         parent::__construct($stream);
 
@@ -67,7 +67,7 @@ class PAF_View_Template extends PAF_View_Abstract
      */
     protected function _setTemplate($template)
     {
-        if (is_file($template))
+        if ((self::NO_TEMPLATE === $template) || is_file($template))
         {
             $this->_template = $template;
         }
@@ -137,7 +137,7 @@ class PAF_View_Template extends PAF_View_Abstract
         {
             ob_start();
             include $this->_template;
-            $this->_stream->put(ob_get_clean());
+            $this->_getStream()->put(ob_get_clean());
         }
         else
         {

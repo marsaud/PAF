@@ -36,20 +36,21 @@ class PAF_Stream_PhpOutputTest extends PHPUnit_Framework_TestCase
     {
         $this->assertNull($this->object->close());
     }
-    
+
     /**
      * @covers PAF_Stream_PhpOutput::startBuffer
      */
     public function testStartBuffer()
     {
-        $object = new PAF_Stream_PhpOutput();
-        $this->assertFalse($object->hasBuffer());
-        $object->startBuffer();
-        $this->assertTrue($object->hasBuffer());
-        
-        return $object;
+        $this->assertFalse($this->object->hasBuffer());
+        $this->object->startBuffer();
+        $this->assertTrue($this->object->hasBuffer());
+        $this->object->startBuffer();
+        $this->assertTrue($this->object->hasBuffer());
+        $this->object->stopBuffer();
+        $this->assertTrue($this->object->hasBuffer());
     }
-    
+
     /**
      * @covers PAF_Stream_PhpOutput::hasBuffer
      */
@@ -57,16 +58,16 @@ class PAF_Stream_PhpOutputTest extends PHPUnit_Framework_TestCase
     {
         $string1 = 'This is not buffered.';
         $string2 = 'Neither is this.';
-        
+
         $this->expectOutputString($string1 . $string2);
-        
+
         $this->assertFalse($this->object->hasBuffer());
         $this->object->put($string1);
-        
+
         $this->object->startBuffer();
         $this->assertTrue($this->object->hasBuffer());
         $this->object->put('This is buffered, so it does not break the output test.');
-        
+
         $this->object->stopBuffer();
         $this->assertFalse($this->object->hasBuffer());
         $this->object->put($string2);
@@ -74,98 +75,119 @@ class PAF_Stream_PhpOutputTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers PAF_Stream_PhpOutput::dropBuffer
-     * @todo   Implement testDropBuffer().
      */
     public function testDropBuffer()
     {
+        $this->expectOutputString('');
+        
+        $this->assertFalse($this->object->hasBuffer());
+        $this->object->startBuffer();
+        $this->assertTrue($this->object->hasBuffer());
+        $this->object->dropBuffer();
         $this->assertFalse($this->object->hasBuffer());
     }
 
     /**
      * @covers PAF_Stream_PhpOutput::flushBuffer
-     * @todo   Implement testFlushBuffer().
+     * @covers PAF_Stream_PhpOutput::<protected>
      */
-    public function testFlushBuffer()
+    public function testFlushBuffer1of2()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $object = new PAF_Stream_PhpOutput();
+        $object->startBuffer();
+        
+        $this->expectOutputString('');
+        $object->put('buffered content');
+        
+        return $object;
+    }
+    
+    /**
+     * @covers PAF_Stream_PhpOutput::flushBuffer
+     * @covers PAF_Stream_PhpOutput::<protected>
+     * @depends testFlushBuffer1of2
+     */
+    public function testFlushBuffer2of2(PAF_Stream_PhpOutput $object)
+    {
+        $this->expectOutputString('buffered content');
+        $object->flushBuffer();
     }
 
     /**
      * @covers PAF_Stream_PhpOutput::getBuffer
-     * @todo   Implement testGetBuffer().
      */
     public function testGetBuffer()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $this->object->startBuffer();
+        
+        $this->expectOutputString('');
+        
+        $this->object->put('buffered content');
+        $this->assertEquals('buffered content', $this->object->getBuffer());
     }
 
     /**
      * @covers PAF_Stream_PhpOutput::open
-     * @todo   Implement testOpen().
      */
     public function testOpen()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $this->assertNull($this->object->open());
     }
-
 
     /**
      * @covers PAF_Stream_PhpOutput::get
-     * @todo   Implement testGet().
      */
     public function testGet()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $this->setExpectedException('PAF_Exception_NoImplementation');
+        $this->object->get();
     }
 
     /**
      * @covers PAF_Stream_PhpOutput::put
-     * @todo   Implement testPut().
+     * @covers PAF_Stream_PhpOutput::<protected>
      */
     public function testPut()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
-    }
-
-    /**
-     * @covers PAF_Stream_PhpOutput::_putDirect
-     * @todo   Implement test_putDirect().
-     */
-    public function test_putDirect()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $this->expectOutputString('streamed content');
+        $this->object->put('streamed content');
+        $this->object->startBuffer();
+        $this->object->put('buffered content');
     }
 
     /**
      * @covers PAF_Stream_PhpOutput::stopBuffer
-     * @todo   Implement testStopBuffer().
      */
     public function testStopBuffer()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $this->expectOutputString('streamed content');
+        $this->object->startBuffer();
+        $this->object->put('buffered content');
+        $this->object->stopBuffer();
+        $this->object->put('streamed content');
     }
 
+    public function testDropBufferException()
+    {
+        $this->setExpectedException('PAF_Exception_NoSuchResource');
+        $this->object->dropBuffer();
+    }
     
-
+    public function testFlushBufferException()
+    {
+        $this->setExpectedException('PAF_Exception_NoSuchResource');
+        $this->object->flushBuffer();
+    }
+    
+    public function testGetBufferException()
+    {
+        $this->setExpectedException('PAF_Exception_NoSuchResource');
+        $this->object->getBuffer();
+    }
+    
+    public function testStopBufferException()
+    {
+        $this->setExpectedException('PAF_Exception_NoSuchResource');
+        $this->object->stopBuffer();
+    }
 }
