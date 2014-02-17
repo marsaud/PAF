@@ -10,7 +10,6 @@ ini_set(
         'include_path', implode(
                 PATH_SEPARATOR, array(
     ini_get('include_path'),
-    realpath(dirname(__FILE__) . '/../library'),
     realpath(dirname(__FILE__) . '/../library')
                 )
         )

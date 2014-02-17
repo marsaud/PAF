@@ -12,10 +12,12 @@
  *
  * @author fabrice
  */
-class PAF_View_Component_TreeNode
+class PAF_View_Component_TreeNode implements Iterator
 {
 
     const DEFAULT_CONTENT = 'NODE';
+    const RENDER_OUTPUT_PRINT = 'RENDER_OUTPUT_PRINT';
+    const RENDER_OUTPUT_RETURN = 'RENDER_OUTPUT_RETURN';
 
     /**
      *
@@ -68,14 +70,22 @@ class PAF_View_Component_TreeNode
         $this->_initChildNodes();
     }
 
-    public function render()
+    public function render($outputMode = self::RENDER_OUTPUT_PRINT)
     {
+        if (self::RENDER_OUTPUT_RETURN === $outputMode)
+        {
+            ob_start();
+        }
         ?>
         <div class="node">
             <?php $this->_renderFace(); ?>
             <?php $this->_renderChildNodes(); ?>
         </div>
         <?php
+        if (self::RENDER_OUTPUT_RETURN === $outputMode)
+        {
+            return ob_get_clean();
+        }
     }
 
     protected function _renderContent()
@@ -129,6 +139,36 @@ class PAF_View_Component_TreeNode
             default:
                 throw new OutOfRangeException('No "' . $name . '" read property');
         }
+    }
+
+    public function __toString()
+    {
+        return $this->render(self::RENDER_OUTPUT_RETURN);
+    }
+
+    public function current()
+    {
+        return current($this->_childNodes);
+    }
+
+    public function key()
+    {
+        return key($this->_childNodes);
+    }
+
+    public function next()
+    {
+        return next($this->_childNodes);
+    }
+
+    public function rewind()
+    {
+        return reset($this->_childNodes);
+    }
+
+    public function valid()
+    {
+        return false !== current($this->_childNodes);
     }
 
 }
